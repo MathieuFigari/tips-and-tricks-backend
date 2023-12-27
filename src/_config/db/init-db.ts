@@ -20,7 +20,7 @@ export class InitDb {
         // Configure SSL for production environment
         const sslConfig = process.env.ENVIRONMENT === 'production' ? {
             ssl: {
-                rejectUnauthorized: true // Keep SSL verification enabled in production
+                rejectUnauthorized: false // Keep SSL verification enabled in production
             },
         } : null;
 

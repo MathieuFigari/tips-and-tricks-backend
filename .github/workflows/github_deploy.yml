@@ -1,50 +1,30 @@
-name: Push-to-EC2
+name: Deploy-to-Heroku
 
-# Trigger deployment only on push to master branch
 on:
     push:
         branches:
             - main
 
 permissions:
-    id-token: write   # This is required for requesting the JWT
-    contents: read    # This is required for actions/checkout
+    contents: read
 
 jobs:
     deploy:
-        name: Deploy to EC2 on push on main branch
+        name: Deploy to Heroku on push on main branch
         runs-on: ubuntu-latest
 
         steps:
-            - name: Git clone checkout repository
-              uses: actions/checkout@v3
-
-            - name: Install Node.js
-              uses: actions/setup-node@v3
+            - uses: actions/checkout@v3
+            - uses: actions/setup-node@v3
               with:
                   node-version: '18.13'
 
-            - name: Deploy on AWS EC2
-              uses: easingthemes/ssh-deploy@main
+            # Heroku Deploy
+            - name: Deploy to Heroku
+              uses: akhileshns/heroku-deploy@v3.12.12 # Cette action simplifie le déploiement sur Heroku
               with:
-                  SSH_PRIVATE_KEY: ${{ secrets.EC2_SSH_KEY }}
-                  REMOTE_HOST: ${{ secrets.HOST_DNS }}
-                  REMOTE_USER: ${{ secrets.USERNAME }}
-                  TARGET: ${{ secrets.TARGET }}
+                  heroku_api_key: ${{ secrets.HEROKU_API_KEY }}
+                  heroku_app_name: "tips-and-tricks-api"
+                  heroku_email: "mathieu.figari@gmail.com"
 
-            - name: Build and Run
-              env:
-                  SSH_PRIVATE_KEY: ${{ secrets.EC2_SSH_KEY }}
-                  HOST_DNS: ${{ secrets.HOST_DNS }}
-                  USERNAME: ${{ secrets.USERNAME }}
-                  NODE_PORT: ${{ secrets.NODE_PORT }}
-              run: |
-                  echo "$SSH_PRIVATE_KEY" > private_key && chmod 600 private_key
-                  ssh -o StrictHostKeyChecking=no -i private_key ${USERNAME}@${HOST_DNS} '
-                      source /home/ubuntu/.profile &&
-                      cd tipsandtricks &&
-                      export NVM_DIR=/home/ubuntu/.nvm &&
-                      source /home/ubuntu/.nvm/nvm.sh &&
-                      npm install && npm run build &&
-                      npm run restart
-                  '
+                  

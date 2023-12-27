@@ -13,7 +13,7 @@
     "dev:windows": "SET DEBUG=tipsandtricks:* && nodemon ./src/index.ts",
     "pretty-lint": "prettier src --check --write && eslint src --fix",
     "init-db": "ts-node ./src/_config/db/init-db.ts",
-    "init-db-prod": "ENVIRONMENT=production ts-node ./src/_config/db/init-db.ts"
+    "init-db-prod": "SET ENVIRONMENT=production ts-node ./src/_config/db/init-db.ts"
   },
   "repository": {
     "type": "git",

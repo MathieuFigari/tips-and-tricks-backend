@@ -1,1 +1,3 @@
 release: npm run init-db-prod
+web: npm start
+

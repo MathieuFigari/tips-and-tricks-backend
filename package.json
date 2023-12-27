@@ -6,9 +6,9 @@
   "scripts": {
     "test": "jest -c jest.config.ts",
     "build": "vite build",
-    "start": "sudo pm2 start ./dist/index.mjs",
-    "restart": "sudo pm2 restart ./dist/index.mjs",
-    "stop": "sudo pm2 stop ./dist/index.mjs",
+    "start": "node dist/index.js",
+    "restart": "heroku restart",
+    "stop": "heroku stop",
     "dev": "DEBUG=tipsandtricks:* nodemon ./src/index.ts",
     "dev:windows": "SET DEBUG=tipsandtricks:* && nodemon ./src/index.ts",
     "pretty-lint": "prettier src --check --write && eslint src --fix",

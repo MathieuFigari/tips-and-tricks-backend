@@ -18,7 +18,7 @@ export class InitDb {
 
     async init(): Promise<void> {
        
-        const sslConfig = process.env.NODE_ENV === 'production' ? {
+        const sslConfig = process.env.ENVIRONMENT === 'production' ? {
             ssl: {
                 rejectUnauthorized: true // La vérification SSL doit être activée en production
             }
@@ -57,7 +57,7 @@ export class InitDb {
         .readFiles()
         .then(() => console.log('Migrations Success !'))
         .catch((err) => console.log('Migrations failed : ' + err.message));
-    // if (process.env.NODE_ENV === 'production') {
+    // if (process.env.ENVIRONMENT === 'production') {
     //     await init.pg.end();
     //     return;
     // }

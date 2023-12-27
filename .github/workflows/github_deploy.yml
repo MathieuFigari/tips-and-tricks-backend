@@ -23,8 +23,8 @@ jobs:
       - name: Build
         run: npm run build
 
-      - name: Deploy to Railway
-        uses: devtomio/action-railway@v1.1.4
-        with:
-            railway_token: ${{ secrets.RAILWAY_TOKEN }}
+      - name: Deploy
+        run: railway up --service ${{ secrets.RAILWAY_SERVICE }}
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
 

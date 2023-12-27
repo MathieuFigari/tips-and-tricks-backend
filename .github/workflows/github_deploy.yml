@@ -24,7 +24,7 @@ jobs:
         run: npm run build
 
       - name: Deploy
-        run: railway up --service ${{ secrets.RAILWAY_SERVICE }}
+        run: railway up 
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
 

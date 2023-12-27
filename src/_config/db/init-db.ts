@@ -1,30 +1,30 @@
-import postgres, { Sql } from 'postgres';
+import postgres from 'postgres';
 import * as dotenv from 'dotenv';
-import * as process from 'process';
 import * as fs from 'fs';
 import * as path from 'path';
 import UsersFixtures from './fixtures/01_usersFixture';
 import TipsFixtures from './fixtures/02_tipsFixtures';
 import PostsFixtures from './fixtures/03_postsFixtures';
 import ReactionsFixtures from './fixtures/04_reactionsFixtures';
+
 dotenv.config();
 
 export class InitDb {
-    private _pg: Sql;
+    private _pg: postgres.Sql;
 
     get pg(): postgres.Sql {
         return this._pg;
     }
 
     async init(): Promise<void> {
-        this._pg = postgres({
-            host: process.env.PGHOST || '127.0.0.1', // Postgres ip address[s] or domain name[s]
-            port: process.env.PGPORT ? parseInt(process.env.PGPORT) : 5433, // Postgres server port[s]
-            database: process.env.PGDB || 'tipsandtricks', // Name of database to connect to
-            username: process.env.PGUSER || 'ttuser', // Username of database user
-            password: process.env.PGPASSWORD || 'changeme', // Username of database
-            ssl: process.env.ENVIRONMENT === 'production',
-        });
+        // Configure SSL for production environment
+        const sslConfig = process.env.ENVIRONMENT === 'production' ? {
+            ssl: {
+                rejectUnauthorized: true // Keep SSL verification enabled in production
+            },
+        } : null;
+
+        this._pg = postgres(process.env.DATABASE_URL, sslConfig);
     }
 
     async readFiles(): Promise<void> {

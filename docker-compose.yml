@@ -1,0 +1,43 @@
+version: "3"
+
+services:
+
+    pgsql:
+        image: postgres:latest
+        environment:
+            POSTGRES_PASSWORD: '${PGPASSWORD}'
+            POSTGRES_USER: '${PGUSER}'
+            POSTGRES_DB: '${PGDB}'
+            PGDATA: /db/postgres
+        ports:
+            - "5433:5432"
+        command: postgres -c 'max_connections=1000'
+        networks:
+            - bdd
+        volumes:
+            - ./data/postgresql:/var/lib/postgresql/db
+
+    adminer:
+        image: adminer:latest
+        ports:
+            - '8080:8080'
+        expose:
+            - '8080'
+        depends_on:
+            - pgsql
+        networks:
+            - bdd
+
+    maildev:
+        hostname: maildev
+        image: maildev/maildev
+        command: bin/maildev --web 80 --smtp 25 --hide-extensions STARTTLS
+        restart: always
+        ports:
+            - "1080:80"
+            - "25:25"
+
+networks:
+    bdd:
+        driver: bridge
+

@@ -1,0 +1,28 @@
+{
+  "compilerOptions": {
+    "outDir": "./dist/",
+    "baseUrl": ".",
+    "rootDir": ".",
+    "sourceMap": true,
+    "noImplicitAny": false,
+    "target": "es6",
+    "downlevelIteration": true,
+    "allowJs": true,
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "skipLibCheck": true,
+    "strictPropertyInitialization": false,
+    "resolveJsonModule": true,
+    "types": [
+      "node",
+      "jest",
+      "jest-extended",
+      "jest-expect-message"
+    ]
+  },
+  "files": ["node_modules/jest-extended/types/index.d.ts", "node_modules/jest-expect-message/types/index.d.ts"],
+  "include": ["src/**/*"],
+}

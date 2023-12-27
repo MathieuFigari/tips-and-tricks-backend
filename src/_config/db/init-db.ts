@@ -20,7 +20,7 @@ export class InitDb {
        
         const sslConfig = process.env.ENVIRONMENT === 'production' ? {
             ssl: {
-                rejectUnauthorized: true // La vérification SSL doit être activée en production
+                rejectUnauthorized: false // La vérification SSL doit être activée en production
             }
         } : undefined;
 

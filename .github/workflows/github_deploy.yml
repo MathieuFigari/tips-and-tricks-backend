@@ -1,30 +1,30 @@
-name: Deploy-to-Heroku
+name: Deploy-to-Railway
 
 on:
-    push:
-        branches:
-            - main
-
-permissions:
-    contents: read
+  push:
+    branches:
+      - main
 
 jobs:
-    deploy:
-        name: Deploy to Heroku on push on main branch
-        runs-on: ubuntu-latest
+  deploy:
+    name: Deploy to Railway on push to main branch
+    runs-on: ubuntu-latest
 
-        steps:
-            - uses: actions/checkout@v3
-            - uses: actions/setup-node@v3
-              with:
-                  node-version: '18.13'
+    steps:
+      - uses: actions/checkout@v3
 
-            # Heroku Deploy
-            - name: Deploy to Heroku
-              uses: akhileshns/heroku-deploy@v3.12.12 # Cette action simplifie le déploiement sur Heroku
-              with:
-                  heroku_api_key: ${{ secrets.HEROKU_API_KEY }}
-                  heroku_app_name: "tips-and-tricks-api"
-                  heroku_email: "mathieu.figari@gmail.com"
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '18.13'
 
-                  
+      - name: Install Railway CLI
+        run: npm install -g railway
+
+      - name: Login to Railway
+        run: railway login --token ${{ secrets.RAILWAY_TOKEN }}
+
+      - name: Deploy to Railway
+        run: railway up
+        env:
+          RAILWAY_ENVIRONMENT: production
+

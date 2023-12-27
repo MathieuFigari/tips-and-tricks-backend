@@ -10,21 +10,22 @@ import ReactionsFixtures from './fixtures/04_reactionsFixtures';
 dotenv.config();
 
 export class InitDb {
-    private _pg: Sql;
+    private _pg: postgres.Sql;
 
     get pg(): postgres.Sql {
         return this._pg;
     }
 
     async init(): Promise<void> {
-        this._pg = postgres({
-            host: process.env.PGHOST || '127.0.0.1', // Postgres ip address[s] or domain name[s]
-            port: process.env.PGPORT ? parseInt(process.env.PGPORT) : 5433, // Postgres server port[s]
-            database: process.env.PGDB || 'tipsandtricks', // Name of database to connect to
-            username: process.env.PGUSER || 'ttuser', // Username of database user
-            password: process.env.PGPASSWORD || 'changeme', // Username of database
-            ssl: process.env.ENVIRONMENT === 'production',
-        });
+       
+        const sslConfig = process.env.NODE_ENV === 'production' ? {
+            ssl: {
+                rejectUnauthorized: true // La vérification SSL doit être activée en production
+            }
+        } : undefined;
+
+        this._pg = postgres(process.env.DATABASE_URL, sslConfig);
+
     }
 
     async readFiles(): Promise<void> {
@@ -56,10 +57,10 @@ export class InitDb {
         .readFiles()
         .then(() => console.log('Migrations Success !'))
         .catch((err) => console.log('Migrations failed : ' + err.message));
-    if (process.env.NODE_ENV === 'production') {
-        await init.pg.end();
-        return;
-    }
+    // if (process.env.NODE_ENV === 'production') {
+    //     await init.pg.end();
+    //     return;
+    // }
     await new UsersFixtures(init.pg).givenSomeUsers(5);
     await new TipsFixtures(init.pg).givenSomeTips(500);
     await new PostsFixtures(init.pg).givenSomePosts(500);

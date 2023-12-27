@@ -6,11 +6,7 @@
   "scripts": {
     "test": "jest -c jest.config.ts",
     "build": "vite build",
-<<<<<<< HEAD
-    "start": "node dist/index.js",
-=======
     "start": "node dist/index.mjs",
->>>>>>> 3d950933e1090a828a47c30ed47fa6879ac9668d
     "restart": "heroku restart",
     "stop": "heroku stop",
     "dev": "DEBUG=tipsandtricks:* nodemon ./src/index.ts",

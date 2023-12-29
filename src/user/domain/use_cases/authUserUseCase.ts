@@ -117,8 +117,8 @@ export default class AuthUserUseCase implements AuthUserUseCaseInterface {
         const today = new Date();
         let cookieOptions = {
             httpOnly: true,
-            sameSite: false,
-            secure: process.env.ENVIRONNMENT === 'production',
+            sameSite: 'none',
+            secure: true,
             expires: new Date(today.setMonth(today.getMonth() + 1)),
         } as CookieOptions;
 

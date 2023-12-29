@@ -52,11 +52,13 @@ export default class AuthController {
             const inputLoginUser = new InputLoginUser(req.body.email, req.body.password);
             const data = (await this._authUserUseCase.login(inputLoginUser)) as UserLogged;
 
-            res.cookie('ACCESS_TOKEN', data.tokens.access_token, { ...this._authUserUseCase.generateCookies() })
+            res.cookie('ACCESS_TOKEN', data.tokens.access_token, {sameSite: 'None', ...this._authUserUseCase.generateCookies() })
                 .cookie('REFRESH_TOKEN', data.tokens.refresh_token, {
+                    sameSite: 'None',
                     ...this._authUserUseCase.generateCookies('/api/refresh-token'),
                 })
                 .cookie('REFRESH_TOKEN', data.tokens.refresh_token, {
+                    sameSite: 'None',
                     ...this._authUserUseCase.generateCookies('/api/reconnect'),
                 });
 
@@ -104,11 +106,13 @@ export default class AuthController {
         try {
             const tokens: JwtToken = await this._authUserUseCase.refreshToken(req.email);
 
-            res.cookie('ACCESS_TOKEN', tokens.access_token, { ...this._authUserUseCase.generateCookies() })
+            res.cookie('ACCESS_TOKEN', tokens.access_token, {sameSite: 'None',  ...this._authUserUseCase.generateCookies() })
                 .cookie('REFRESH_TOKEN', tokens.refresh_token, {
+                    sameSite: 'None',
                     ...this._authUserUseCase.generateCookies('/api/refresh-token'),
                 })
                 .cookie('REFRESH_TOKEN', tokens.refresh_token, {
+                    sameSite: 'None',
                     ...this._authUserUseCase.generateCookies('/api/reconnect'),
                 });
 
@@ -179,12 +183,15 @@ export default class AuthController {
             const userLogged = await this._authUserUseCase.tryReconnect(jwtTokens);
             if (userLogged) {
                 res.cookie('ACCESS_TOKEN', userLogged.tokens.access_token, {
+                    sameSite: 'None',
                     ...this._authUserUseCase.generateCookies(),
                 })
                     .cookie('REFRESH_TOKEN', userLogged.tokens.refresh_token, {
+                        sameSite: 'None',
                         ...this._authUserUseCase.generateCookies('/api/refresh-token'),
                     })
                     .cookie('REFRESH_TOKEN', userLogged.tokens.refresh_token, {
+                        sameSite: 'None',
                         ...this._authUserUseCase.generateCookies('/api/reconnect'),
                     });
 

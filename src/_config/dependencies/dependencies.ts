@@ -23,8 +23,7 @@ import ReactionRepositoryPostgres from '../../reaction/server-side/reactionRepos
 dependencyContainer.set<Sql>(
     'sql',
     () => {
-      const sslConfig = process.env.ENVIRONMENT === 'production' ? { ssl: { rejectUnauthorized: false } } : null;
-      return postgres(process.env.DATABASE_URL, sslConfig);
+      return postgres(process.env.DATABASE_URL);
     },
     true,
   );

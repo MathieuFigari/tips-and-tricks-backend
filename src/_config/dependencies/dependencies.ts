@@ -23,17 +23,11 @@ import ReactionRepositoryPostgres from '../../reaction/server-side/reactionRepos
 dependencyContainer.set<Sql>(
     'sql',
     () => {
-        return postgres({
-            host: process.env.PGHOST || '127.0.0.1', // Postgres ip address[s] or domain name[s]
-            port: process.env.PGPORT ? parseInt(process.env.PGPORT) : 5433, // Postgres server port[s]
-            database: process.env.PGDB || 'tipsandtricks', // Name of database to connect to
-            username: process.env.PGUSER || 'ttuser', // Username of database user
-            password: process.env.PGPASSWORD || 'changeme', // Username of database user
-            ssl: process.env.ENVIRONMENT === 'production',
-        });
+      const sslConfig = process.env.ENVIRONMENT === 'production' ? { ssl: { rejectUnauthorized: false } } : null;
+      return postgres(process.env.DATABASE_URL, sslConfig);
     },
     true,
-);
+  );
 
 dependencyContainer.set<UserRepositoryInterface>('UserRepository', () => {
     return new UserRepositoryPostgres(dependencyContainer.get<Sql>('sql'));

@@ -27,17 +27,35 @@ describe('Return a list of posts', () => {
         ${3}  | ${6}   | ${30}
     `('can return posts with a start and a limit', async ({ start, length, numberOfPosts }) => {
         const expectedPosts = sut.givenAListOfPosts(numberOfPosts);
-        const expectedResponse = sut.buildAnInifiniteResponse(start, length, expectedPosts);
+        const expectedResponse = sut.buildAnInifiniteResponse(start, length, expectedPosts, expectedPosts.length);
 
         const listOfPosts = await new ListPostUseCase(postRepository).getList({ start, length });
         expect(listOfPosts).toEqual(expectedResponse);
     });
 
     test('can return InfiniteResponse with empty data if there is no tips in bdd', async () => {
-        const expectedResponse = sut.buildAnInifiniteResponse(0, 2, []);
+        const expectedResponse = sut.buildAnInifiniteResponse(0, 2, [], 0);
 
         const listOfPosts = await new ListPostUseCase(postRepository).getList({ start: 0, length: 2 });
         expect(listOfPosts).toEqual(expectedResponse);
+    });
+
+    test('can return filtered posts list by tag', async () => {
+        sut.givenAListOfPosts(10);
+        const tagIdForFiltering = 1;
+        const expectedFilteredPosts = sut.givenFilteredpostsByTag(tagIdForFiltering);
+        const expectedResponse = sut.buildAnInifiniteResponse(
+            0,
+            10,
+            expectedFilteredPosts,
+            expectedFilteredPosts.length,
+        );
+
+        const filteredTipsList = await new ListPostUseCase(postRepository).getList(
+            { start: 0, length: 10 },
+            tagIdForFiltering,
+        );
+        expect(filteredTipsList).toEqual(expectedResponse);
     });
 });
 
@@ -69,8 +87,12 @@ class SUT {
         return postList;
     }
 
-    buildAnInifiniteResponse(start: number, length: number, posts: Post[]): InfiniteResponse<Post> {
+    buildAnInifiniteResponse(start: number, length: number, posts: Post[], totalCount: number): InfiniteResponse<Post> {
         const expectedPosts = posts.slice(start, start + length);
-        return new InfiniteResponse<Post>(start, length, expectedPosts);
+        return new InfiniteResponse<Post>(start, length, expectedPosts, totalCount);
+    }
+
+    givenFilteredpostsByTag(tagId: number): Post[] {
+        return this._postRepository.postInMemory.filter((post) => post.tags.some((tag) => tag.id === tagId));
     }
 }

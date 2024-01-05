@@ -30,6 +30,24 @@ export default class UserRepositoryInMemory implements UserRepositoryInterface {
         return this._usersInMemory.find((user: User) => user.username === username);
     }
 
+    getUser(userId: number): Promise<User | null> {
+        const user = this._usersInMemory.find((user) => user.id === userId);
+        if (!user) {
+            return Promise.resolve(null);
+        }
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const { password, refresh_token, ...userInfo } = user;
+        return Promise.resolve(userInfo);
+    }
+
+    async deleteUser(userId: number): Promise<boolean> {
+        const initialLength = this._usersInMemory.length;
+
+        this._usersInMemory = this._usersInMemory.filter((user) => !(user.id === userId));
+
+        return this._usersInMemory.length !== initialLength;
+    }
+
     async setRefreshToken(userId: number, refreshToken: string): Promise<boolean> {
         const user = this._usersInMemory.find((user) => user.id === userId);
         if (!user) return false;

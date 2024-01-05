@@ -54,6 +54,7 @@ export default class updateTipsController {
                 req.body.command,
                 description,
                 req.user.id,
+                req.body.tags,
             );
 
             const data = await this._updateTipsUseCase.update(inputUpdateTips);

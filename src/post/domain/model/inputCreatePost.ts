@@ -1,3 +1,5 @@
+import Tag from '../../../tag/domain/model/tag';
+
 /**
  * @swagger
  * components:
@@ -10,6 +12,7 @@
  *         - message
  *         - title
  *         - command
+ *         - tags
  *       properties:
  *         user_id:
  *           type: number
@@ -21,6 +24,10 @@
  *           type: string
  *         message:
  *           type: string
+ *         tags:
+ *           type: array
+ *           items:
+ *             $ref: '#/components/schemas/Tag'
  *       example:
  *         user_id: 1
  *         title: Un test super utile !
@@ -34,6 +41,7 @@ export default class InputCreatePost {
         public message: string,
         public description: string | null,
         public command: string,
+        public tags: Tag[],
         public user_id: number,
     ) {}
 }

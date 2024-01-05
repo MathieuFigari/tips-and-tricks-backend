@@ -55,6 +55,10 @@ class SUT {
             title: faker.lorem.words({ min: 1, max: 3 }),
             description: faker.lorem.paragraph({ min: 1, max: 2 }),
             command: faker.lorem.words({ min: 1, max: 3 }),
+            tags: [
+                { id: 1, label: 'tag1', created_at: new Date('2022-12-17T03:24:00'), updated_at: null },
+                { id: 2, label: 'tag2', created_at: new Date('2022-12-17T03:24:00'), updated_at: null },
+            ],
         };
     }
 
@@ -72,6 +76,7 @@ class SUT {
             .withCommand(input.command)
             .withDescription(input.description)
             .withMessage(input.message)
+            .withTags(input.tags)
             .buildPost();
     }
 

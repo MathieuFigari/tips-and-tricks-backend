@@ -7,4 +7,6 @@ export default interface UserRepositoryInterface {
     getByUsername(username: string): Promise<User>;
     setRefreshToken(userId: number, refreshToken: string): Promise<boolean>;
     revokeToken(email: string): Promise<boolean>;
+    getUser(userId: number): Promise<User>;
+    deleteUser(userId: number): Promise<boolean>;
 }

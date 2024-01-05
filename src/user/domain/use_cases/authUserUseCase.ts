@@ -8,6 +8,7 @@ import debug from 'debug';
 import UserFactory from '../factories/userFactory';
 import AuthError from '../../../_common/domain/errors/authError';
 import { JwtPayload } from 'jsonwebtoken';
+import NotFoundError from '../../../_common/domain/errors/notFoundError';
 const logger = debug('tipsandtricks:authUserUseCase');
 
 export interface AuthUserUseCaseInterface {
@@ -80,6 +81,16 @@ export default class AuthUserUseCase implements AuthUserUseCaseInterface {
 
         const userToSend = UserFactory.createWithoutPassword(user);
         return await this._generateTokens(userToSend);
+    }
+
+    async deleteUserAccount(userId: number): Promise<void> {
+        const user = await this._userRepository.getUser(userId);
+        if (!user) {
+            throw new NotFoundError('User not found');
+        }
+
+        await this.revokeRefreshToken(user.email);
+        await this._userRepository.deleteUser(userId);
     }
 
     async checkValidityRefreshToken(email: string, refreshToken: string): Promise<boolean> {

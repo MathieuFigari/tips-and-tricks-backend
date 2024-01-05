@@ -1,4 +1,5 @@
 import TipsRepositoryInterface, { TipsList } from '../../domain/ports/tipsRepositoryInterface';
+import Tag from '../../../tag/domain/model/tag';
 import Tips from '../../domain/models/Tips';
 import * as dotenv from 'dotenv';
 import InputCreateTips from '../../domain/models/inputCreateTips';
@@ -6,7 +7,7 @@ import InputUpdateTips from '../../domain/models/InputUpdateTips';
 dotenv.config();
 
 export default class TipsRepositoryInMemory implements TipsRepositoryInterface {
-    public tipsInMemory: Array<Tips> = [];
+    public tipsInMemory: Array<Tips & { tags: Tag[] }> = [];
     private _error: boolean = false;
 
     async create(input: InputCreateTips): Promise<Tips | null> {
@@ -18,6 +19,7 @@ export default class TipsRepositoryInMemory implements TipsRepositoryInterface {
                     input.title,
                     input.command,
                     input.description,
+                    input.tags,
                     new Date('2022-12-17T03:24:00'),
                     new Date('2022-12-17T03:24:00'),
                     null,
@@ -36,6 +38,7 @@ export default class TipsRepositoryInMemory implements TipsRepositoryInterface {
                 input.title,
                 input.command,
                 input.description,
+                input.tags,
                 new Date('2022-12-17T03:24:00'),
                 new Date('2022-12-17T03:24:00'),
                 null,
@@ -45,13 +48,15 @@ export default class TipsRepositoryInMemory implements TipsRepositoryInterface {
         return null;
     }
 
-    async getList(userId: number, page: number, length: number): Promise<TipsList> {
+    async getList(userId: number, page: number, length: number, tagId?: number): Promise<TipsList> {
         const start = length * (page - 1);
-        const end = length * page;
-        const tips = this.tipsInMemory.filter((element) => element.user_id === userId);
+        const filteredTips = this.tipsInMemory.filter(
+            (tip) => tip.user_id === userId && (!tagId || tip.tags.some((tag) => tag.id === tagId)),
+        );
+
         return {
-            tips: tips.slice(start, end),
-            total: tips.length,
+            tips: filteredTips.slice(start, start + length),
+            total: filteredTips.length,
         };
     }
 

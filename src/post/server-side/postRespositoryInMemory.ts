@@ -6,8 +6,30 @@ export default class PostRepositoryInMemory implements PostRepositoryInterface {
     public postInMemory: Array<PostFullData> = [];
     private _error: boolean = false;
 
-    async getList(start: number, length: number): Promise<PostFullData[]> {
-        return this.postInMemory.slice(start, start + length);
+    async getList(
+        start: number,
+        length: number,
+        tagId?: number,
+    ): Promise<{ posts: PostFullData[]; totalCount: number }> {
+        let filteredPosts = this.postInMemory;
+        if (tagId) {
+            filteredPosts = filteredPosts.filter((post) => post.tags.some((tag) => tag.id === tagId));
+        }
+
+        // Total count of posts after filtering
+        const totalCount = filteredPosts.length;
+
+        // Slice for pagination
+        const paginatedPosts = filteredPosts.slice(start, start + length);
+
+        // Map to PostFullData structure, if necessary
+        const posts = paginatedPosts.map((post) => ({
+            ...post,
+            // ... other properties as needed
+            comment_count: post.comment_count,
+        }));
+
+        return { posts, totalCount };
     }
 
     async create(input: InputCreatePost & { slug: string }): Promise<Post | null> {
@@ -20,6 +42,7 @@ export default class PostRepositoryInMemory implements PostRepositoryInterface {
                 input.description,
                 input.message,
                 input.command,
+                input.tags,
                 {
                     like: 10,
                     dislike: 10,
@@ -33,12 +56,14 @@ export default class PostRepositoryInMemory implements PostRepositoryInterface {
     }
 
     async getPost(postId: number): Promise<PostFullData | null> {
-        const post = this.postInMemory.splice(postId - 1, 1);
-
-        if (!post) return null;
-        if (!post) return null;
-
-        return post.shift();
+        const post = this.postInMemory.find((post) => post.id === postId);
+        if (post) {
+            return {
+                ...post,
+                comment_count: post.comment_count,
+            };
+        }
+        return null;
     }
 
     setPost(post: PostFullData): PostRepositoryInMemory {

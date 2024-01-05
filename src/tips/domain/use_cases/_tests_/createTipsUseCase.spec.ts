@@ -66,6 +66,10 @@ class SUT {
             command: faker.lorem.words(5),
             description: faker.lorem.words(10),
             user_id: 4,
+            tags: [
+                { id: 1, label: 'tag1', created_at: new Date('2022-12-17T03:24:00'), updated_at: null },
+                { id: 2, label: 'tag2', created_at: new Date('2022-12-17T03:24:00'), updated_at: null },
+            ],
         };
     }
 
@@ -76,6 +80,7 @@ class SUT {
             .withTitle(inputTips.title)
             .withCommand(inputTips.command)
             .withDescription(inputTips.description)
+            .withTags(inputTips.tags)
             .buildTips();
     }
 
@@ -89,6 +94,10 @@ class SUT {
             command: faker.lorem.words(5),
             description: faker.lorem.words(10),
             user_id: 4,
+            tags: [
+                { id: 1, label: faker.lorem.words(3), created_at: new Date('2022-12-17T03:24:00'), updated_at: null },
+                { id: 2, label: faker.lorem.words(3), created_at: new Date('2022-12-17T03:24:00'), updated_at: null },
+            ],
         };
     }
 }

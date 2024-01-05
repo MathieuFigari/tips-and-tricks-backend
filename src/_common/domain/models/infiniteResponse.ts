@@ -3,5 +3,6 @@ export default class InfiniteResponse<T> {
         public start: number,
         public length: number,
         public data: Array<T> = [],
+        public totalCount: number,
     ) {}
 }

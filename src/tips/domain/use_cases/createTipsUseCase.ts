@@ -4,6 +4,7 @@ import Tips from '../models/Tips';
 import InputCreateTips from '../models/inputCreateTips';
 import InputError from '../../../_common/domain/errors/inputError';
 import debug from 'debug';
+import Tag from '../../../tag/domain/model/tag';
 dotenv.config();
 const logger = debug('tipsandtricks:registerUserUseCase');
 
@@ -40,9 +41,16 @@ export default class CreateTipsUseCase implements CreateTipsRepositoryInterface 
                 case 'command':
                     isValid.push(this._checkFormat(value));
                     break;
+                case 'tags':
+                    isValid.push(this.validateTags(value));
+                    break;
             }
         }
         return isValid.every((item) => item);
+    }
+
+    private validateTags(tags: Tag[]): boolean {
+        return tags && tags.length > 0;
     }
 
     public _checkFormat(value: string): boolean {

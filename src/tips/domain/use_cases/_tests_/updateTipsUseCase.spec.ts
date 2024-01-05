@@ -37,8 +37,6 @@ describe('Return a modified tips', () => {
             const inputUpdateTips = sut.givenAnInputUpdateTips();
             sut.givenAnError();
             await new UpdateTipsUseCase(tipsRepository).update(inputUpdateTips);
-
-            //This expect breaks the test because it must throw an error
             expect(false).toEqual(true);
         } catch (err) {
             expect(err._statusCode).toEqual(400);
@@ -51,7 +49,6 @@ describe('Return a modified tips', () => {
             const inputUpdateTips = sut.givenAnInputTipsWithBadInputFormat();
             await new UpdateTipsUseCase(tipsRepository).update(inputUpdateTips);
 
-            //This expect breaks the test because it must throw an error
             expect(false).toEqual(true);
         } catch (err) {
             expect(err._statusCode).toEqual(400);
@@ -72,6 +69,10 @@ class SUT {
             command: faker.lorem.words(5),
             description: faker.lorem.words(10),
             user_id: 1,
+            tags: [
+                { id: 1, label: 'tag1', created_at: new Date('2022-12-17T03:24:00'), updated_at: null },
+                { id: 2, label: 'tag2', created_at: new Date('2022-12-17T03:24:00'), updated_at: null },
+            ],
         };
     }
 
@@ -82,6 +83,10 @@ class SUT {
             command: faker.lorem.words(5),
             description: faker.lorem.words(10),
             user_id: 1,
+            tags: [
+                { id: 1, label: 'tag1', created_at: new Date('2022-12-17T03:24:00'), updated_at: null },
+                { id: 2, label: 'tag2', created_at: new Date('2022-12-17T03:24:00'), updated_at: null },
+            ],
         };
     }
 
@@ -90,6 +95,7 @@ class SUT {
             .withTitle(input.title)
             .withCommand(input.command)
             .withDescription(input.description)
+            .withTags(input.tags)
             .buildTips();
         this._tipsRepositoryInMemory.setTips(tips);
         return tips;
@@ -106,6 +112,10 @@ class SUT {
             command: faker.lorem.words(5),
             description: faker.lorem.words(10),
             user_id: 4,
+            tags: [
+                { id: 1, label: 'tag1', created_at: new Date('2022-12-17T03:24:00'), updated_at: null },
+                { id: 2, label: 'tag2', created_at: new Date('2022-12-17T03:24:00'), updated_at: null },
+            ],
         };
     }
 }

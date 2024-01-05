@@ -1,3 +1,5 @@
+import Tag from '../../../tag/domain/model/tag';
+
 /**
  * @swagger
  * components:
@@ -12,6 +14,7 @@
  *         - message
  *         - title
  *         - command
+ *         - tags
  *         - published_at
  *         - created_at
  *         - updated_at
@@ -30,6 +33,10 @@
  *           type: string
  *         message:
  *           type: string
+ *         tags:
+ *           type: array
+ *           items:
+ *             $ref: '#/components/schemas/Tag'
  *         published_at:
  *           type: string
  *           format: date
@@ -60,6 +67,7 @@ export default class Post {
         public description: string | null,
         public message: string,
         public command: string,
+        public tags: Tag[],
         public reactions: {
             like: number;
             dislike: number;
@@ -70,4 +78,4 @@ export default class Post {
     ) {}
 }
 
-export type PostFullData = Post & { username: string };
+export type PostFullData = Post & { username: string; comment_count: number };

@@ -1,5 +1,6 @@
 import * as dotenv from 'dotenv';
 import Post, { PostFullData } from '../../model/post';
+import Tag from '../../../../tag/domain/model/tag';
 dotenv.config();
 
 export default class PostTestBuilder {
@@ -9,8 +10,13 @@ export default class PostTestBuilder {
     private _command: string = 'npm run dev';
     private _slug: string = 'un-superbe-post';
     private _message: string = 'mon message !';
+    private _tags: Tag[] = [
+        { id: 1, label: 'tag1', created_at: new Date('2022-12-17T03:24:00'), updated_at: null },
+        { id: 1, label: 'tag1', created_at: new Date('2022-12-17T03:24:00'), updated_at: null },
+    ];
     private _description: string = 'Vraiment super !';
     private _username: string = 'username';
+    private _comment_count: number = 0;
     private _reactions: { like: number; dislike: number } = { like: 10, dislike: 10 };
     private readonly _published_at: Date = new Date('2022-12-17T03:24:00');
     private readonly _created_at: Date = new Date('2022-12-17T03:24:00');
@@ -25,6 +31,7 @@ export default class PostTestBuilder {
             this._description,
             this._message,
             this._command,
+            this._tags,
             this._reactions,
             this._published_at,
             this._created_at,
@@ -36,6 +43,7 @@ export default class PostTestBuilder {
         return {
             ...this.buildPost(),
             username: this._username,
+            comment_count: this._comment_count,
         };
     }
 
@@ -86,6 +94,11 @@ export default class PostTestBuilder {
 
     withUsername(username: string): PostTestBuilder {
         this._username = username;
+        return this;
+    }
+
+    withTags(tags: Tag[]): PostTestBuilder {
+        this._tags = tags;
         return this;
     }
 }

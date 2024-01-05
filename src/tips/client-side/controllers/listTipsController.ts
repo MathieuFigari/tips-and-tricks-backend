@@ -47,9 +47,12 @@ export default class ListTipsController {
                 req.query.length ? +req.query.length : 14,
             );
 
+            const tagId = req.query.tagId ? Number(req.query.tagId) : undefined;
+
             const paginatedResponse: PaginatedResponse<Tips> = await this._listTipsUseCase.getList(
                 +req.user.id,
                 paginatedInput,
+                tagId,
             );
 
             return res.status(200).send(paginatedResponse);

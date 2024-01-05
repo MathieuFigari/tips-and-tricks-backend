@@ -43,6 +43,7 @@ export default class createPostController {
                 message,
                 description,
                 req.body.command,
+                req.body.tags,
                 req.user.id,
             );
             const data = await this._createPostUseCase.create(inputCreatePost);

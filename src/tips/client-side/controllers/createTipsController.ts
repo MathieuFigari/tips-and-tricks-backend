@@ -36,7 +36,13 @@ export default class createTipsController {
     public async create(req: RequestLogged, res: Response, next: NextFunction) {
         try {
             const description: string = req.body.description === '' ? null : req.body.description;
-            const inputTips = new InputCreateTips(req.body.title, req.body.command, description, req.user.id);
+            const inputTips = new InputCreateTips(
+                req.body.title,
+                req.body.command,
+                description,
+                req.user.id,
+                req.body.tags,
+            );
             const data = await this._createTipsUseCase.create(inputTips);
             return res.status(201).send({
                 data: data,

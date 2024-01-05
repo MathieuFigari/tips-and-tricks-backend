@@ -22,6 +22,14 @@ import createPostController from '../../post/client-side/controllers/createPosts
 import CreatePostUseCase from '../../post/domain/use_cases/createPostsUseCase';
 import ReactionController from '../../reaction/client-side/controllers/reactionController';
 import ReactionOnPostUseCase from '../../reaction/domain/uses_case/reactionOnPostUseCase';
+import ListTagsController from '../../tag/client-side/controllers/listTagsController';
+import ListTagUseCase from '../../tag/domain/use_cases/listTagsUseCase';
+import ListCommentsController from '../../comment/client-side/controllers/listCommentsController';
+import ListCommentsUseCase from '../../comment/domain/use_cases/listCommentsUseCase';
+import CreateCommentUseCase from '../../comment/domain/use_cases/createCommentUseCase';
+import createCommentController from '../../comment/client-side/controllers/createCommentController';
+import GetUserInfosController from '../../user/client-side/controllers/getUserInfosController';
+import GetUserInformationsUseCase from '../../user/domain/use_cases/getUserInformationsUseCase';
 
 const router = Router();
 
@@ -40,6 +48,28 @@ router.get('/api/reconnect', async (req: RequestLogged, res: Response, next: Nex
         next,
     );
 });
+
+router.get(
+    '/api/me',
+    new AuthMiddleware().authorize('ACCESS_TOKEN'),
+    async (req: RequestLogged, res: Response, next: NextFunction) => {
+        return await new GetUserInfosController(
+            dependencyContainer.get<GetUserInformationsUseCase>('GetUserInformationsUseCase'),
+        ).getUser(req, res, next);
+    },
+);
+
+router.delete(
+    '/api/me',
+    new AuthMiddleware().authorize('ACCESS_TOKEN'),
+    async (req: RequestLogged, res: Response, next: NextFunction) => {
+        return await new AuthController(dependencyContainer.get<AuthUserUseCase>('AuthUserUseCase')).deleteAccount(
+            req,
+            res,
+            next,
+        );
+    },
+);
 
 router.post('/api/register', async (req: RequestLogged, res: Response, next: NextFunction) => {
     return await new RegisterController(dependencyContainer.get<RegisterUserUseCase>('RegisterUserUseCase')).register(
@@ -170,6 +200,30 @@ router.get(
         return await new ReactionController(
             dependencyContainer.get<ReactionOnPostUseCase>('ReactionOnPostUseCase'),
         ).getReactionForCurrentUser(req, res, next);
+    },
+);
+
+router.get('/api/tags', async (req: RequestLogged, res: Response, next: NextFunction) => {
+    return await new ListTagsController(dependencyContainer.get<ListTagUseCase>('ListTagUseCase')).tagsList(
+        req,
+        res,
+        next,
+    );
+});
+
+router.get('/api/post/:postId/comments', async (req: RequestLogged, res: Response, next: NextFunction) => {
+    return await new ListCommentsController(
+        dependencyContainer.get<ListCommentsUseCase>('ListCommentsUseCase'),
+    ).commentsList(req, res, next);
+});
+
+router.post(
+    '/api/post/:postId/comment',
+    new AuthMiddleware().authorize('ACCESS_TOKEN'),
+    async (req: RequestLogged, res: Response, next: NextFunction) => {
+        return await new createCommentController(
+            dependencyContainer.get<CreateCommentUseCase>('CreateCommentUseCase'),
+        ).create(req, res, next);
     },
 );
 

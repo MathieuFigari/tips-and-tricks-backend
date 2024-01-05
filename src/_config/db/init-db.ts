@@ -1,12 +1,15 @@
-import postgres, { Sql } from 'postgres';
+import postgres from 'postgres';
 import * as dotenv from 'dotenv';
 import * as process from 'process';
 import * as fs from 'fs';
 import * as path from 'path';
 import UsersFixtures from './fixtures/01_usersFixture';
-import TipsFixtures from './fixtures/02_tipsFixtures';
+import TipsFixtures from './fixtures/04_tipsFixtures';
 import PostsFixtures from './fixtures/03_postsFixtures';
-import ReactionsFixtures from './fixtures/04_reactionsFixtures';
+import ReactionsFixtures from './fixtures/05_reactionsFixtures';
+import TagsFixtures from './fixtures/02_tagsFixture';
+import CommentFixtures from './fixtures/06_commentFixtures';
+
 dotenv.config();
 
 export class InitDb {
@@ -17,15 +20,16 @@ export class InitDb {
     }
 
     async init(): Promise<void> {
-       
-        const sslConfig = process.env.ENVIRONMENT === 'production' ? {
-            ssl: {
-                rejectUnauthorized: true
-            }
-        } : undefined;
+        const sslConfig =
+            process.env.ENVIRONMENT === 'production'
+                ? {
+                      ssl: {
+                          rejectUnauthorized: true,
+                      },
+                  }
+                : undefined;
 
         this._pg = postgres(process.env.DATABASE_URL, sslConfig);
-
     }
 
     async readFiles(): Promise<void> {
@@ -62,9 +66,11 @@ export class InitDb {
     //     return;
     // }
     await new UsersFixtures(init.pg).givenSomeUsers(5);
+    await new TagsFixtures(init.pg).givenDevelopmentTags();
     await new TipsFixtures(init.pg).givenSomeTips(500);
     await new PostsFixtures(init.pg).givenSomePosts(500);
     await new ReactionsFixtures(init.pg).givenSomeReactions();
+    await new CommentFixtures(init.pg).givenCommentsForEveryPostAndUser();
+
     await init.pg.end();
 })();
-

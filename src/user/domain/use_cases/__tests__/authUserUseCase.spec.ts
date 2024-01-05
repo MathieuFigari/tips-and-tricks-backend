@@ -28,7 +28,6 @@ describe('Login a user', () => {
                 const inputLoginUser = sut.givenAnInputLoginUser();
                 sut.givenAUserWithNotExistEmail();
                 await new AuthUserUseCase(userRepository).login(inputLoginUser);
-                //This expect breaks the test because it must throw an error
                 expect(false).toEqual(true);
             } catch (err) {
                 expect(err.message).toEqual('Login errors !');
@@ -40,7 +39,6 @@ describe('Login a user', () => {
                 const inputLoginUser = sut.givenAnInputLoginUser();
                 sut.givenAUserWithBadPassword();
                 await new AuthUserUseCase(userRepository).login(inputLoginUser);
-                //This expect breaks the test because it must throw an error
                 expect(false).toEqual(true);
             } catch (err) {
                 expect(err.message).toEqual('Login errors !');
@@ -95,13 +93,11 @@ describe('Login a user', () => {
 
     describe('Delete refresh token', () => {
         test('return void and throw no error if refresh token is delete for this user', async () => {
-            // This try catch allows to check if an error is throw
             try {
                 const userLogged = await sut.givenALoggedUser();
                 await new AuthUserUseCase(userRepository).revokeRefreshToken(userLogged.user.email);
                 expect(true).toBe(true);
             } catch (err) {
-                //This expect breaks the test because it must not throw an error
                 expect(true).toBe(false);
             }
         });
@@ -110,7 +106,6 @@ describe('Login a user', () => {
             try {
                 await sut.givenALoggedUser();
                 await new AuthUserUseCase(userRepository).revokeRefreshToken(faker.internet.email());
-                //This expect breaks the test because it must throw an error
                 expect(true).toBe(false);
             } catch (err) {
                 expect(true).toBe(true);
@@ -175,6 +170,16 @@ describe('Login a user', () => {
             } catch (err) {
                 expect(true).toEqual(true);
             }
+        });
+    });
+
+    describe('Delete user account', () => {
+        test('successfully deletes a user account', async () => {
+            const userLogged = await sut.givenALoggedUser();
+            await new AuthUserUseCase(userRepository).deleteUserAccount(userLogged.user.id);
+
+            const deletedUser = await userRepository.getUser(userLogged.user.id);
+            expect(deletedUser).toBeNull();
         });
     });
 });

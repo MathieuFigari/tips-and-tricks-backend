@@ -52,19 +52,54 @@ export default class AuthController {
             const inputLoginUser = new InputLoginUser(req.body.email, req.body.password);
             const data = (await this._authUserUseCase.login(inputLoginUser)) as UserLogged;
 
-            res.cookie('ACCESS_TOKEN', data.tokens.access_token, {...this._authUserUseCase.generateCookies() })
+            res.cookie('ACCESS_TOKEN', data.tokens.access_token, { ...this._authUserUseCase.generateCookies() })
                 .cookie('REFRESH_TOKEN', data.tokens.refresh_token, {
-                    
                     ...this._authUserUseCase.generateCookies('/api/refresh-token'),
                 })
                 .cookie('REFRESH_TOKEN', data.tokens.refresh_token, {
-                   
                     ...this._authUserUseCase.generateCookies('/api/reconnect'),
                 });
 
             return res.status(200).send({
                 data: data.user,
             });
+        } catch (err) {
+            next(err);
+        }
+    }
+
+    /**
+     * @openapi
+     * tags:
+     *   name: User
+     *   description: Delete a user account
+     * /delete-account:
+     *   delete:
+     *     summary: Delete a user account
+     *     tags: [User]
+     *     security:
+     *       - cookieAuth: [
+     *           ACCESS_TOKEN=abcde12345; Path=/; HttpOnly;
+     *       ]
+     *     responses:
+     *       200:
+     *         description: Account deletion successful
+     *       400:
+     *         description: Bad request
+     *       401:
+     *         description: Unauthorized
+     *       500:
+     *         description: Some server errors
+     *
+     */
+    public async deleteAccount(req: RequestLogged, res: Response, next: NextFunction) {
+        try {
+            const userId = req.user.id;
+            await this._authUserUseCase.deleteUserAccount(userId);
+
+            res.clearCookie('ACCESS_TOKEN');
+
+            return res.status(200).send({ message: 'Account successfully deleted.' });
         } catch (err) {
             next(err);
         }

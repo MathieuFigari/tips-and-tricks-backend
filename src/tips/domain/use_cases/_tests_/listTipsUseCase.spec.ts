@@ -21,7 +21,7 @@ describe('Return tips list', () => {
     });
 
     test('can return all user tips in a paginated response', async () => {
-        const expectedTips = sut.givenAListOfTips();
+        const expectedTips = sut.givenAListOfTips(25);
         const expectedResponse = sut.buildAPaginatedResponse(1, sut.nbOfTips, expectedTips);
 
         const listOfTip = await new ListTipsUseCase(tipsRepository).getList(1, { page: 1, length: sut.nbOfTips });
@@ -29,7 +29,7 @@ describe('Return tips list', () => {
     });
 
     test('not returns another user tips in a paginated response', async () => {
-        const expectedTips = sut.givenAListOfTips();
+        const expectedTips = sut.givenAListOfTips(25);
         sut.buildAPaginatedResponse(1, sut.nbOfTips, expectedTips);
 
         const listOfTip = await new ListTipsUseCase(tipsRepository).getList(1, { page: 1, length: sut.nbOfTips });
@@ -44,13 +44,26 @@ describe('Return tips list', () => {
         expect(listOfTips).toEqual(expectedResponse);
     });
 
+    test('can return filtered tips list by tag', async () => {
+        sut.givenAListOfTips(10);
+        const tagIdForFiltering = 1;
+        const expectedFilteredTips = sut.givenFilteredTipsByTag(tagIdForFiltering);
+
+        const filteredTipsList = await new ListTipsUseCase(tipsRepository).getList(
+            1,
+            { page: 1, length: 10 },
+            tagIdForFiltering,
+        );
+        expect(filteredTipsList.data).toEqual(expectedFilteredTips);
+    });
+
     test.each`
         page | length
         ${1} | ${10}
         ${2} | ${14}
         ${4} | ${3}
     `('can returns $length tips in the page $page', async ({ page, length }) => {
-        const execptedlistOfTips = sut.givenAListOfTips();
+        const execptedlistOfTips = sut.givenAListOfTips(40);
         const expectedResponse = sut.buildAPaginatedResponse(
             page,
             length,
@@ -65,7 +78,7 @@ describe('Return tips list', () => {
 
 class SUT {
     private _tipsTestBuilder: TipsTestBuilder;
-    public nbOfTips: number = 100;
+    public nbOfTips: number = 25;
     constructor(private readonly _tipsRepositoryInMemory: TipsRepositoryInMemory) {
         this._tipsTestBuilder = new TipsTestBuilder();
     }
@@ -80,9 +93,9 @@ class SUT {
         return tips;
     }
 
-    givenAListOfTips(): Array<Tips> {
+    givenAListOfTips(count: number): Array<Tips> {
         const listOfTips = [];
-        for (let i = 0; i < this.nbOfTips; i++) {
+        for (let i = 0; i < count; i++) {
             listOfTips.push(this.givenATips());
         }
 
@@ -91,5 +104,9 @@ class SUT {
 
     buildAPaginatedResponse(page: number, length: number, tips: Tips[]): PaginatedResponse<Tips> {
         return new PaginatedResponse<Tips>(page, length, this._tipsRepositoryInMemory.tipsInMemory.length, tips);
+    }
+
+    givenFilteredTipsByTag(tagId: number): Tips[] {
+        return this._tipsRepositoryInMemory.tipsInMemory.filter((tip) => tip.tags.some((tag) => tag.id === tagId));
     }
 }

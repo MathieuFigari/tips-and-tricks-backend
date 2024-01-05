@@ -16,27 +16,35 @@ export default class ListPostsController {
      *   get:
      *     summary: Retrieve posts list
      *     parameters:
-     *      - in: query
-     *        name: start
-     *        schema:
+     *       - in: query
+     *         name: start
+     *         schema:
      *           type: integer
-     *        description: The point which is use for start posts list.
-     *      - in: query
-     *        name: length
-     *        schema:
+     *         description: The point which is use for start posts list.
+     *       - in: query
+     *         name: length
+     *         schema:
      *           type: integer
-     *        description: Determines the number of posts to recover.
-     *     tags: [Post]
+     *         description: Determines the number of posts to recover.
+     *       - in: query
+     *         name: tagId
+     *         schema:
+     *           type: integer
+     *         description: The optional filter by Tags.
+     *       - in: query
+     *         name: search
+     *         schema:
+     *           type: string
+     *         description: The optional search by title, description or message.
      *     responses:
      *       200:
      *         description: Post recovered.
      *         content:
-     *          application/json:
-     *              schema:
-     *                  $ref: '#/components/schemas/Post'
+     *           application/json:
+     *             schema:
+     *               $ref: '#/components/schemas/Post'
      *       500:
      *         description: Some server errors
-     *
      */
     public async postsList(req: RequestLogged, res: Response, next: NextFunction) {
         try {
@@ -45,7 +53,15 @@ export default class ListPostsController {
                 req.query.length ? +req.query.length : 20,
             );
 
-            const infiniteResponse: InfiniteResponse<Post> = await this._listPostsUseCase.getList(infiniteInput);
+            const search = typeof req.query.search === 'string' ? req.query.search : undefined;
+
+            const tagId = req.query.tagId ? Number(req.query.tagId) : undefined;
+
+            const infiniteResponse: InfiniteResponse<Post> = await this._listPostsUseCase.getList(
+                infiniteInput,
+                tagId,
+                search,
+            );
 
             return res.status(200).send(infiniteResponse);
         } catch (err) {

@@ -29,6 +29,24 @@ export default class UserRepositoryPostgres implements UserRepositoryInterface {
         });
     }
 
+    async getUser(userId: number): Promise<User | null> {
+        return this._sql`SELECT id, email, username FROM "user" WHERE "id" = ${userId}`.then((rows) => {
+            if (rows.length > 0) {
+                return UserRepositoryPostgresFactory.create(rows[0]);
+            }
+            return null;
+        });
+    }
+
+    async deleteUser(userId: number): Promise<boolean> {
+        return this._sql`DELETE FROM "user" WHERE "id" = ${userId}`.then((rows) => {
+            if (rows.count === 0) {
+                return false;
+            }
+            return true;
+        });
+    }
+
     async getByUsername(username: string): Promise<User> {
         const rows = await this._sql`select * from "user" where "username" = ${username}`;
         if (rows.length > 0) {

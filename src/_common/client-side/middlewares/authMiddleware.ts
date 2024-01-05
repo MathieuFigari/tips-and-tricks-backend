@@ -17,6 +17,7 @@ export default class AuthMiddleware {
 
                 switch (tokenName) {
                     case 'ACCESS_TOKEN': {
+                        console.log(authCookies)
                         request.user = dependencyContainer
                             .get<AuthUserUseCase>('AuthUserUseCase')
                             .verifyAccessToken(authCookies['ACCESS_TOKEN']);
@@ -25,6 +26,7 @@ export default class AuthMiddleware {
                         return next();
                     }
                     case 'REFRESH_TOKEN': {
+                        console.log(authCookies)
                         request.email = await dependencyContainer
                             .get<AuthUserUseCase>('AuthUserUseCase')
                             .verifyRefreshToken(authCookies['REFRESH_TOKEN']);

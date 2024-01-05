@@ -62,7 +62,6 @@ export default class ListPostsController {
                 tagId,
                 search,
             );
-
             return res.status(200).send(infiniteResponse);
         } catch (err) {
             next(err);

@@ -61,7 +61,7 @@ export default class PostRepositoryPostgres implements PostRepositoryInterface {
             );
         }
         if (tagId) {
-            whereClauses.push(`pt.tag_id = ${tagId}`);
+            whereClauses.push(`p.id IN (SELECT post_id FROM post_tags WHERE tag_id = ${tagId})`);
         }
 
         if (whereClauses.length) {

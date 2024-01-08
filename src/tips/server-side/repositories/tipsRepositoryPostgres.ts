@@ -57,34 +57,40 @@ export default class TipsRepositoryPostgres implements TipsRepositoryInterface {
     ): Promise<{ tips: Tips[]; total: number }> {
         const start = (page - 1) * length;
 
-        let query = `
-            SELECT 
-                t.*,
-                COALESCE(json_agg(json_build_object('id', tag.id, 'label', tag.label)) FILTER (WHERE tag.id IS NOT NULL), '[]') AS tags
-            FROM 
-                "tips" t
-            LEFT JOIN 
-                "tips_tags" tt ON t.id = tt.tips_id
-            LEFT JOIN 
-                "tag" tag ON tt.tag_id = tag.id
-            WHERE 
-                t."user_id" = ${userId}
-        `;
-
-        if (tagId) {
-            query += ` AND EXISTS (
-                SELECT 1 FROM "tips_tags" tt2
-                WHERE tt2.tips_id = t.id AND tt2.tag_id = ${tagId}
-            )`;
+        const query = this._sql`
+        SELECT 
+        ti.*,
+        COALESCE(
+            (
+                SELECT json_agg(json_build_object('id', t.id, 'label', t.label))
+                FROM tag t
+                JOIN tips_tags tt ON tt.tag_id = t.id
+                WHERE tt.tips_id = ti.id
+            ),
+            '[]'
+        ) AS tags
+    FROM 
+        "tips" ti
+    LEFT JOIN 
+        "tips_tags" tt ON ti.id = tt.tips_id
+    LEFT JOIN 
+        "tag" t ON tt.tag_id = t.id
+    WHERE 
+        ti."user_id" = ${userId}
+        ${
+            tagId
+                ? this._sql`AND ti.id IN (
+            SELECT tt2.tips_id 
+            FROM tips_tags tt2 
+            WHERE tt2.tag_id = ${tagId}
+        )`
+                : this._sql``
         }
+    GROUP BY ti.id
+    ORDER BY ti.published_at DESC, ti.id
+    OFFSET ${start} LIMIT ${length}`;
 
-        query += `
-            GROUP BY t.id
-            ORDER BY t.published_at DESC, t.id
-            OFFSET ${start} LIMIT ${length}
-        `;
-
-        const tips = await this._sql.unsafe(query).then((rows) =>
+        const tips = await query.then((rows) =>
             rows.map(
                 (row) =>
                     new Tips(
@@ -101,19 +107,22 @@ export default class TipsRepositoryPostgres implements TipsRepositoryInterface {
             ),
         );
 
-        let totalQuery = `
-            SELECT COUNT(*) FROM "tips" t
-            WHERE t."user_id" = ${userId}
-        `;
-
-        if (tagId) {
-            totalQuery += ` AND EXISTS (
-                SELECT 1 FROM "tips_tags" tt
-                WHERE tt.tips_id = t.id AND tt.tag_id = ${tagId}
-            )`;
+        const total = await this._sql`SELECT COUNT(DISTINCT ti.id) AS total
+        FROM "tips" ti 
+        JOIN "user" u ON u."id" = ti."user_id"
+        WHERE ti."user_id" = ${userId}
+        ${
+            tagId
+                ? this._sql`AND ti.id IN (
+            SELECT tt.tips_id 
+            FROM tips_tags tt 
+            WHERE tt.tag_id = ${tagId}
+        )`
+                : this._sql``
         }
-
-        const total = await this._sql.unsafe(totalQuery).then((rows) => parseInt(rows[0].count, 10));
+        `.then((rows) => {
+            return rows[0].total;
+        });
 
         return { tips, total };
     }

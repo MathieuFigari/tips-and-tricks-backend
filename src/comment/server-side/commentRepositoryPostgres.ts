@@ -11,7 +11,7 @@ export default class CommentRepositoryPostgres implements CommentRepositoryInter
         length: number,
         postId: number,
     ): Promise<{ comments: CommentFullData[]; totalCount: number }> {
-        const query = `
+        const query = this._sql`
             SELECT 
                 c.*,
                 u.username
@@ -25,23 +25,20 @@ export default class CommentRepositoryPostgres implements CommentRepositoryInter
             OFFSET ${start} LIMIT ${length}
         `;
 
-        const comments = await this._sql.unsafe(query);
+        const totalCount = await this._sql`select count(*) as total from "comment" where "post_id" = ${postId}`.then(
+            (rows) => {
+                return rows[0].total;
+            },
+        );
 
-        const totalCountQuery = `
-        SELECT COUNT(*)
-        FROM "comment"
-        WHERE "post_id" = ${postId}
-    `;
-        const totalCountResult = await this._sql.unsafe(totalCountQuery);
-        const totalCount = parseInt(totalCountResult[0].count, 10);
-
-        return {
-            comments: comments.map((row) => ({
+        const comments = await query.then((rows) =>
+            rows.map((row) => ({
                 ...CommentRepositoryPostgresFactory.create(row),
                 username: row.username,
             })),
-            totalCount: totalCount,
-        };
+        );
+
+        return { comments, totalCount };
     }
 
     async create(input: InputCreateComment, userName: string): Promise<CommentFullData> {

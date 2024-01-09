@@ -20,16 +20,8 @@ export class InitDb {
     }
 
     async init(): Promise<void> {
-        const sslConfig =
-            process.env.ENVIRONMENT === 'production'
-                ? {
-                      ssl: {
-                          rejectUnauthorized: true,
-                      },
-                  }
-                : undefined;
-
-        this._pg = postgres(process.env.DATABASE_URL, sslConfig);
+       
+        this._pg = postgres(process.env.DATABASE_URL);
     }
 
     async readFiles(): Promise<void> {

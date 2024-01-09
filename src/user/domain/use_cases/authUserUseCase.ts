@@ -19,8 +19,9 @@ export type CookieOptions = {
     httpOnly: boolean;
     sameSite: boolean | 'lax' | 'strict' | 'none';
     secure: boolean;
-    expires: Date;
+    expires?: Date;
     path?: string;
+    maxAge?: number;
 };
 
 export default class AuthUserUseCase implements AuthUserUseCaseInterface {
@@ -125,11 +126,10 @@ export default class AuthUserUseCase implements AuthUserUseCaseInterface {
     }
 
     generateCookies(route: string | null = null): CookieOptions {
-        const today = new Date();
         let cookieOptions = {
             httpOnly: true,
+            secure: process.env.ENVIRONMENT === 'production',
             sameSite: true,
-            expires: new Date(today.setMonth(today.getMonth() + 1)),
         } as CookieOptions;
 
         if (route) cookieOptions = { ...cookieOptions, path: route };

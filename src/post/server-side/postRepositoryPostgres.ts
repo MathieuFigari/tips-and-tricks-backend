@@ -33,7 +33,7 @@ export default class PostRepositoryPostgres implements PostRepositoryInterface {
         search?: string,
     ): Promise<{ posts: PostFullData[]; totalCount: number }> {
         const Coefficient = 0.2;
-        const FreshnessCoefficient = 0.15;
+        const FreshnessCoefficient = 0.1;
         const query = this._sql`
             SELECT 
         p.*,

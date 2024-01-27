@@ -23,9 +23,10 @@ jobs:
       - name: Build
         run: npm run build
 
+      - name: Install Railway
+        run: npm install -g @railway/cli
       - name: Deploy to Railway
-        uses: devtomio/action-railway@v1.1.4
-        with:
-            railway_token: ${{ secrets.RAILWAY_TOKEN }}
-            args: --service exact-heat
+        run: RAILWAY_TOKEN=$RAILWAY_TOKEN railway up 
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
 

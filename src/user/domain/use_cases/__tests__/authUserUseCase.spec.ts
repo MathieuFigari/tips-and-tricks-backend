@@ -159,7 +159,7 @@ describe('Login a user', () => {
         test('reconnect and return the user if the access token is not valid and the refresh token is ok, new tokens are created', async () => {
             const expectedUser = await sut.givenALoggedUserWithBadAccessToken();
             const user = await new AuthUserUseCase(userRepository).tryReconnect(expectedUser.tokens);
-            expect(user.user.id).toEqual(expectedUser.user);
+            expect(user.user.id).toEqual(expectedUser.user.id);
         });
 
         test('throw an error if both access_token and refresh_token are invalid', async () => {

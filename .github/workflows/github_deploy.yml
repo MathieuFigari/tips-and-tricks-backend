@@ -26,10 +26,14 @@ jobs:
       - name: Install Railway
         run: npm install -g @railway/cli
 
+      - name: Link Service
+        run: railway service tips-and-tricks-backend.railway.internal
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+
       - name: Deploy to Railway
         run:  railway up 
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
-        with:
-          service: "tips-and-tricks-backend.railway.internal"  
+          
 

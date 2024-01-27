@@ -20,7 +20,6 @@ export class InitDb {
     }
 
     async init(): Promise<void> {
-       
         this._pg = postgres(process.env.DATABASE_URL);
     }
 

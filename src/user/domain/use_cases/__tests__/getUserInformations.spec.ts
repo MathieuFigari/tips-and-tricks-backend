@@ -31,7 +31,7 @@ describe('get user informations', () => {
 class SUT {
     private _userTestBuilder: UserTestBuilder;
     constructor(private readonly _userRepositoryInMemory: UserRepositoryInMemory) {
-        this._userTestBuilder = new UserTestBuilder() ;
+        this._userTestBuilder = new UserTestBuilder();
     }
 
     givenAnInputLoginUser(): InputLoginUser {

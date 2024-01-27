@@ -31,5 +31,5 @@ jobs:
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
         with:
-        service: "tips-and-tricks-backend.railway.internal"  
+          service: "tips-and-tricks-backend.railway.internal"  
 

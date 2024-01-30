@@ -38,15 +38,12 @@ export default class PostRepositoryPostgres implements PostRepositoryInterface {
             SELECT 
         p.*,
         u.username,
-        COALESCE(
-            (
+                (
                 SELECT json_agg(json_build_object('id', t.id, 'label', t.label))
                 FROM tag t
                 JOIN post_tags pt ON pt.tag_id = t.id
                 WHERE pt.post_id = p.id
-            ),
-            '[]'
-        ) AS tags,
+            ) AS tags,
         (
             SELECT count(*)
             FROM "reaction" r
@@ -66,10 +63,6 @@ export default class PostRepositoryPostgres implements PostRepositoryInterface {
         "post" p
     JOIN 
         "user" u ON u."id" = p."user_id"
-    JOIN 
-        "post_tags" pt ON p.id = pt.post_id
-    JOIN 
-        "tag" t ON pt.tag_id = t.id
     ${
         tagId
             ? this._sql`WHERE p.id IN (

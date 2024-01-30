@@ -60,21 +60,14 @@ export default class TipsRepositoryPostgres implements TipsRepositoryInterface {
         const query = this._sql`
         SELECT 
         ti.*,
-        COALESCE(
-            (
-                SELECT json_agg(json_build_object('id', t.id, 'label', t.label))
-                FROM tag t
-                JOIN tips_tags tt ON tt.tag_id = t.id
-                WHERE tt.tips_id = ti.id
-            ),
-            '[]'
-        ) AS tags
+        (
+            SELECT json_agg(json_build_object('id', t.id, 'label', t.label))
+            FROM tag t
+            JOIN tips_tags tt ON tt.tag_id = t.id
+            WHERE tt.tips_id = ti.id
+            ) AS tags 
     FROM 
         "tips" ti
-    LEFT JOIN 
-        "tips_tags" tt ON ti.id = tt.tips_id
-    LEFT JOIN 
-        "tag" t ON tt.tag_id = t.id
     WHERE 
         ti."user_id" = ${userId}
         ${
